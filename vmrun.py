@@ -239,7 +239,7 @@ def check_if_tools_running():
 
 
 def ssh_key_data_to_list(d):
-    return [' '.join(line.replace(b'\n', b'').split(' ')[0:2]) for line in d if len(line) is not 0]
+    return [' '.join(line.replace('\n', '').split(' ')[0:2]) for line in d if len(line) is not 0]
 
 
 def read_ssh_pubkey(file_path):
@@ -308,7 +308,7 @@ def make_sudoer():
         if b'Authentication failure' in cmd_ret:
             print_error('Incorrect root password.', quit=False)
 
-    if sudoers_line.replace(b"'", b'') == cmd_ret:
+    if sudoers_line.replace("'", '') == cmd_ret:
         print_error('This user is already in the sudoers file.')
     else:
         cmd_ret = run_sudo_command("echo " + sudoers_line + " >> /etc/sudoers", sudo_pwd)
