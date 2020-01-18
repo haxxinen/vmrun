@@ -12,14 +12,13 @@ pip3 install -r requirements.txt && deactivate
 py="`pwd`/.venv/bin/python3"
 vmrun="`pwd`/vmrun.py"
 
-os=`uname`
 case `uname` in
     'Linux' )
-        profile=`[ $os == 'Linux' ] && echo '.profile'`
+        profile='.profile' ;;
     'Darwin' )
-        profile=`[ $os == 'Darwin' ] && echo '.bash_profile'`
+        profile='.bash_profile' ;;
     * )
-        profile=""
+        profile='' ;;
 esac
 
 echo >> ~/$profile
