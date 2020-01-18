@@ -11,9 +11,16 @@ pip3 install -r requirements.txt && deactivate
 # link project as alias
 py="`pwd`/.venv/bin/python3"
 vmrun="`pwd`/vmrun.py"
-os=`uname -a | awk '{print $1}'`
-profile=`[ $os == 'Linux' ] && echo '.profile'`
-profile=`[ $os == 'Darwin' ] && echo '.bash_profile'`
+
+os=`uname`
+case `uname` in
+    'Linux' )
+        profile=`[ $os == 'Linux' ] && echo '.profile'`
+    'Darwin' )
+        profile=`[ $os == 'Darwin' ] && echo '.bash_profile'`
+    * )
+        profile=""
+esac
 
 echo >> ~/$profile
 echo '### vmrun' >> ~/$profile
