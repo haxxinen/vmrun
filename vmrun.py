@@ -142,7 +142,7 @@ def handle_error(stdout, cmd):
             password = ''
             stdout = execute_cmd_with_password()
     else:
-        print_error_unknown(cmd[3] + ' (' + (' '.join(stdout.replace('\n', '').split('Error: ')[1:])) + ')')
+        print_error_unknown(cmd[3] + ' (' + (' '.join(stdout.replace(b'\n', b'').split('Error: ')[1:])) + ')')
 
     return stdout
 
@@ -220,26 +220,26 @@ def check_if_vm_is_on():
 def tools_exists_on_vm():
     cmd_ret = run_command(
         ['ssh', str(ssh_user + '@' + host), '[ ! -e /tmp/vmware_tools ] && echo False || echo True']
-    ).replace('\n', '')
+    ).replace(b'\n', b'')
     return False if cmd_ret == 'False' else True
 
 
 def check_if_tools_installed():
     cmd_ret = run_command(
         ['ssh', str(ssh_user + '@' + host), '[ ! -e /etc/vmware-tools ] && echo False || echo True']
-    ).replace('\n', '')
+    ).replace(b'\n', b'')
     return False if cmd_ret == 'False' else True
 
 
 def check_if_tools_running():
     cmd_ret = run_command(
         ['ssh', str(ssh_user + '@' + host), '/etc/init.d/vmware-tools status']
-    ).replace('\n', '')
+    ).replace(b'\n', b'')
     return False if b'not running' in cmd_ret else True
 
 
 def ssh_key_data_to_list(d):
-    return [' '.join(line.replace('\n', '').split(' ')[0:2]) for line in d if len(line) is not 0]
+    return [' '.join(line.replace(b'\n', b'').split(' ')[0:2]) for line in d if len(line) is not 0]
 
 
 def read_ssh_pubkey(file_path):
@@ -274,8 +274,8 @@ def push_pubkey_in_authorized_hosts(ssh_pub_key):
 
 
 def run_sudo_command(command, sudo_pwd):
-    command = command.replace("'", '"')
-    command = command.replace('"', '\\"')
+    command = command.replace(b"'", b'"')
+    command = command.replace(b'"', b'\\"')
 
     cmd_ret = run_command([
         'expect', '-c',
@@ -308,7 +308,7 @@ def make_sudoer():
         if b'Authentication failure' in cmd_ret:
             print_error('Incorrect root password.', quit=False)
 
-    if sudoers_line.replace("'", '') == cmd_ret:
+    if sudoers_line.replace(b"'", b'') == cmd_ret:
         print_error('This user is already in the sudoers file.')
     else:
         cmd_ret = run_sudo_command("echo " + sudoers_line + " >> /etc/sudoers", sudo_pwd)
@@ -320,7 +320,7 @@ def make_sudoer():
 
 def sshuser_is_sudoer():
     check_if_vm_is_on()
-    cmd_ret = run_command(['ssh', str(ssh_user + '@' + host), str('sudo whoami')]).replace('\n', '')
+    cmd_ret = run_command(['ssh', str(ssh_user + '@' + host), str('sudo whoami')]).replace(b'\n', b'')
     return True if cmd_ret == 'root' else False
 
 
