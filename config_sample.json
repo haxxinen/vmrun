@@ -1,0 +1,8 @@
+{
+  "<vm-name>": {
+    "host": "<ip>",
+    "ssh_user": "<ssh-username>",
+    "vm_file": "<full-path-filename>.vmwarevm",
+    "password": ""
+  }
+}
