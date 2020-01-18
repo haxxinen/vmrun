@@ -114,7 +114,7 @@ def run_command(command):
 
     cmd_ret = stdout if len(stdout) is not 0 else stderr
 
-    if 'Error: Cannot open VM' in cmd_ret:
+    if b'Error: Cannot open VM' in cmd_ret:
         cmd_ret = handle_error(cmd_ret, command)
 
     return cmd_ret
@@ -131,13 +131,13 @@ def handle_error(stdout, cmd):
         cmd[2] = password
         return run_command(cmd)
 
-    if 'password is required' in stdout:
+    if b'password is required' in stdout:
         cmd.insert(1, '-vp')
         cmd.insert(2, 'password')
         stdout = execute_cmd_with_password()
 
-    elif 'Incorrect password' in stdout:
-        while 'Incorrect password' in stdout:
+    elif b'Incorrect password' in stdout:
+        while b'Incorrect password' in stdout:
             print_error('Wrong password!', quit=False)
             password = ''
             stdout = execute_cmd_with_password()
@@ -208,7 +208,7 @@ def tools_unmount(tools_image, tools_mount_path):
     elif this_platform == linux_os:
         pass
 
-    if 'unmounted successfully' not in output and not os.path.isdir(tools_mount_path):
+    if b'unmounted successfully' not in output and not os.path.isdir(tools_mount_path):
         print_error('Could not unmount:' + tools_image)
 
 
@@ -235,7 +235,7 @@ def check_if_tools_running():
     cmd_ret = run_command(
         ['ssh', str(ssh_user + '@' + host), '/etc/init.d/vmware-tools status']
     ).replace('\n', '')
-    return False if 'not running' in cmd_ret else True
+    return False if b'not running' in cmd_ret else True
 
 
 def ssh_key_data_to_list(d):
@@ -259,7 +259,7 @@ def read_authorized_keys():
 
 def user_can_ssh_login():
     output = run_command(['ssh', str(ssh_user + '@' + host), '-n', '-o BatchMode=yes'])
-    return False if 'Permission denied' and 'publickey' in output else True
+    return False if b'Permission denied' and b'publickey' in output else True
 
 
 def push_pubkey_in_authorized_hosts(ssh_pub_key):
@@ -302,10 +302,10 @@ def make_sudoer():
     cmd_ret = None
     sudoers_line = "'" + ssh_user + " ALL=(ALL) NOPASSWD:ALL'"
 
-    while cmd_ret is None or 'Authentication failure' in cmd_ret:
+    while cmd_ret is None or b'Authentication failure' in cmd_ret:
         sudo_pwd = read_su_password()
         cmd_ret = run_sudo_command("grep " + sudoers_line + " /etc/sudoers | grep -v '#' | sort -u", sudo_pwd)
-        if 'Authentication failure' in cmd_ret:
+        if b'Authentication failure' in cmd_ret:
             print_error('Incorrect root password.', quit=False)
 
     if sudoers_line.replace("'", '') == cmd_ret:
@@ -327,9 +327,9 @@ def sshuser_is_sudoer():
 def list_dir(remote_dir):
     check_if_vm_is_on()
     output = run_command(['ssh', str(ssh_user + '@' + host), 'ls -laF ' + remote_dir])
-    if 'No such file or directory' in output:
+    if b'No such file or directory' in output:
         print_error('File sharing not activated yet.')
-    if "cannot access '/mnt/hgfs/'" in output:
+    if b"cannot access '/mnt/hgfs/'" in output:
         print_error('File sharing not activated yet.')
     else:
         print(output)
@@ -347,7 +347,7 @@ def wait_for_power():
 def start():
     if not vm_is_powered_on():
         stdout = run_command([vmrun, 'start', vm_file, 'nogui'])
-        if 'PID' in stdout:
+        if b'PID' in stdout:
             print_success('VM is now booting up...')
     else:
         print_success('VM is already running.')
@@ -484,7 +484,7 @@ def pubkey():
 
 
 def exists_on_remote(remote_path):
-    return False if 'No such file or directory' in run_command(
+    return False if b'No such file or directory' in run_command(
         ['ssh', str(ssh_user + '@' + host), 'file ' + remote_path]
     ) else True
 
@@ -607,7 +607,7 @@ if __name__ == '__main__':
             host = vms_cfg[vm_alias]['host']
             ssh_user = vms_cfg[vm_alias]['ssh_user']
             vm_file = vms_cfg[vm_alias]['vm_file']
-            password = vms_cfg[vm_alias]['password'] if 'password' in vms_cfg[vm_alias] else None
+            password = vms_cfg[vm_alias]['password'] if b'password' in vms_cfg[vm_alias] else None
 
         vmrun = vmware_cfg[this_platform]['vmrun']
 
