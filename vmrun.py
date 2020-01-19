@@ -274,14 +274,15 @@ def push_pubkey_in_authorized_hosts(ssh_pub_key):
 
 
 def run_sudo_command(command, sudo_pwd):
-    command = command.replace(b"'", b'"')
-    command = command.replace(b'"', b'\\"')
+    command = command.replace("'", '"')
+    command = command.replace('"', '\\"')
 
     cmd_ret = run_command([
         'expect', '-c',
         "spawn ssh -tt " + str(ssh_user + '@' + host) +
         " \"su -c '" + command + "'\"; expect \"Password:\"; send \"" + sudo_pwd + "\n\"; interact"
-    ])
+    ]).decode("utf-8")
+
     import re
     cmd_ret = re.sub('^spawn.*', '', cmd_ret)
     cmd_ret = re.sub('Password:', '', cmd_ret)
@@ -302,10 +303,10 @@ def make_sudoer():
     cmd_ret = None
     sudoers_line = "'" + ssh_user + " ALL=(ALL) NOPASSWD:ALL'"
 
-    while cmd_ret is None or b'Authentication failure' in cmd_ret:
+    while cmd_ret is None or 'Authentication failure' in cmd_ret:
         sudo_pwd = read_su_password()
         cmd_ret = run_sudo_command("grep " + sudoers_line + " /etc/sudoers | grep -v '#' | sort -u", sudo_pwd)
-        if b'Authentication failure' in cmd_ret:
+        if 'Authentication failure' in cmd_ret:
             print_error('Incorrect root password.', quit=False)
 
     if sudoers_line.replace("'", '') == cmd_ret:
@@ -320,7 +321,7 @@ def make_sudoer():
 
 def sshuser_is_sudoer():
     check_if_vm_is_on()
-    cmd_ret = run_command(['ssh', str(ssh_user + '@' + host), str('sudo whoami')]).replace(b'\n', b'')
+    cmd_ret = run_command(['ssh', str(ssh_user + '@' + host), str('sudo whoami')]).replace('\n', '')
     return True if cmd_ret == 'root' else False
 
 
