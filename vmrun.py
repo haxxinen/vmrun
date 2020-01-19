@@ -332,7 +332,7 @@ def list_dir(remote_dir):
     if b"cannot access '/mnt/hgfs/'" in output:
         print_error('File sharing not activated yet.')
     else:
-        print(output)
+        print(output.decode("utf-8"))
 
 
 def wait_for_power():
@@ -607,7 +607,7 @@ if __name__ == '__main__':
             host = vms_cfg[vm_alias]['host']
             ssh_user = vms_cfg[vm_alias]['ssh_user']
             vm_file = vms_cfg[vm_alias]['vm_file']
-            password = vms_cfg[vm_alias]['password'] if b'password' in vms_cfg[vm_alias] else None
+            password = vms_cfg[vm_alias]['password'] if 'password' in vms_cfg[vm_alias] else None
 
         vmrun = vmware_cfg[this_platform]['vmrun']
 
