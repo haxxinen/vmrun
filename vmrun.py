@@ -239,11 +239,11 @@ def check_if_tools_running():
 
 
 def ssh_key_data_to_list(d):
-    return [' '.join(line.replace('\n', '').split(' ')[0:2]) for line in d if len(line) is not 0]
+    return [' '.join(str(line).replace('\n', '').split(' ')[0:2]) for line in d if len(line) is not 0]
 
 
 def read_ssh_pubkey(file_path):
-    with open(file_path, 'r') as pub_key:
+    with open(file_path, 'rb') as pub_key:
         return ' '.join(ssh_key_data_to_list(pub_key.readlines()))
 
 
