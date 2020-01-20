@@ -34,6 +34,12 @@ $ bash install.sh
 
 ##### 4. Restart `bash` session to apply changes
 
+##### 5. VMware tools
+```
+$ sudo apt-get install open-vm-tools -yqq
+```
+Note: use `vmrun <vm-alias> tools_deploy` for other distros
+
 ## Usage
 
 ##### 1. Help menu
