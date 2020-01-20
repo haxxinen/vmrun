@@ -238,23 +238,23 @@ def check_if_tools_running():
     return False if b'not running' in cmd_ret else True
 
 
-def ssh_key_data_to_list(d):
-    return [' '.join(str(line).replace('\n', '').split(' ')[0:2]) for line in d if len(line) is not 0]
-
-
-def read_ssh_pubkey(file_path):
+def read_local_ssh_pubkey(file_path):
     with open(file_path, 'rb') as pub_key:
-        return ' '.join(ssh_key_data_to_list(pub_key.readlines()))
+        return b' '.join(pub_key.readlines()).replace(b'\n', b'')
 
 
 def read_authorized_keys():
-    return ssh_key_data_to_list(
-        [run_command([
-            'ssh', '-o BatchMode=yes',
-            str(ssh_user + '@' + host),
-            str('cat /home/' + ssh_user + '/.ssh/authorized_keys')
-        ])]
-    )
+    output = run_command([
+        'ssh', '-o StrictHostKeyChecking=no',
+        str(ssh_user + '@' + host),
+        str('cat /home/' + ssh_user + '/.ssh/authorized_keys')
+    ]).split(b'\n')
+
+    if b'No such file or directory' in b' '.join(output):
+        print_error('Could not read authorized_keys file.')
+        return []
+
+    return output
 
 
 def user_can_ssh_login():
@@ -264,13 +264,15 @@ def user_can_ssh_login():
 
 def push_pubkey_in_authorized_hosts(ssh_pub_key):
     print_success('SSHing to add your public key...')
-    return run_command(
-        [
-            'ssh',
-            str(ssh_user + '@' + host),
-            '[ ! -e ~/.ssh/ ] && mkdir ~/.ssh/; echo ' + ssh_pub_key + ' >> ~/.ssh/authorized_keys'
-        ]
-    )
+    cmd = [
+        'ssh', '-o StrictHostKeyChecking=no',
+        str(ssh_user + '@' + host),
+        str(
+            'mkdir ~/.ssh 2>/dev/null; ' +
+            'echo ' + ssh_pub_key + ' >> ~/.ssh/authorized_keys'
+        )
+    ]
+    return run_command(cmd)
 
 
 def run_sudo_command(command, sudo_pwd):
@@ -473,15 +475,17 @@ def pubkey():
     if not os.path.isfile(ssh_pub_key_path):
         print_error('File not found in config: "ssh_pub_key_path".')
 
-    ssh_pub_key = read_ssh_pubkey(ssh_pub_key_path)
+    ssh_pub_key = read_local_ssh_pubkey(ssh_pub_key_path)
 
     can_login = user_can_ssh_login()
     if (not can_login):
-        push_pubkey_in_authorized_hosts(ssh_pub_key + ' ' + getpass.getuser())
+        push_pubkey_in_authorized_hosts(ssh_pub_key.decode("utf-8"))
 
     if ssh_pub_key in read_authorized_keys():
         print_success('Your public SSH key is authorized on VM.')
         ssh()
+    else:
+        print_error('Could not add your public SSH key on VM.')
 
 
 def exists_on_remote(remote_path):
