@@ -258,7 +258,7 @@ def read_authorized_keys():
 
 
 def user_can_ssh_login():
-    output = run_command(['ssh', str(ssh_user + '@' + host), '-n', '-o BatchMode=yes'])
+    output = run_command(['ssh', str(ssh_user + '@' + host), '-n', '-o BatchMode=yes', '-o StrictHostKeyChecking=no'])
     return False if b'Permission denied' and b'publickey' in output else True
 
 
@@ -376,7 +376,7 @@ def reboot():
 
 def ssh():
     check_if_vm_is_on()
-    subprocess.call(['ssh', '-o', 'ConnectTimeout=1', str(ssh_user + '@' + host)])
+    subprocess.call(['ssh', '-o ConnectTimeout=2', '-o StrictHostKeyChecking=no', str(ssh_user + '@' + host)])
 
 
 def check_tools_on_guest():
