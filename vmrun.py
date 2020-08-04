@@ -112,7 +112,7 @@ def run_command(command):
     stdout = cmd.stdout.read()
     stderr = cmd.stderr.read()
 
-    cmd_ret = stdout if len(stdout) is not 0 else stderr
+    cmd_ret = stdout if len(stdout) != 0 else stderr
 
     if b'Error: Cannot open VM' in cmd_ret:
         cmd_ret = handle_error(cmd_ret, command)
@@ -125,7 +125,7 @@ def handle_error(stdout, cmd):
 
     def execute_cmd_with_password():
         global password
-        while password is None or len(password) is 0:
+        while password is None or len(password) == 0:
             password = getpass.getpass('VM Password: ')
 
         cmd[2] = password
@@ -294,7 +294,7 @@ def run_sudo_command(command, sudo_pwd):
 
 def read_su_password():
     sudo_pwd = None
-    while sudo_pwd is None or len(sudo_pwd) is 0:
+    while sudo_pwd is None or len(sudo_pwd) == 0:
         sudo_pwd = getpass.getpass('SU password: ')
     return sudo_pwd
 
@@ -411,7 +411,7 @@ def share_add(local_dirpath):
         print_error('Argument for <local_dirpath> must be a directory.')
 
     local_dirpath = os.path.abspath(local_dirpath)
-    basename = ''.join([directory for directory in local_dirpath.split('/') if len(directory) is not 0][-1:])
+    basename = ''.join([directory for directory in local_dirpath.split('/') if len(directory) != 0][-1:])
 
     run_command([vmrun, 'addSharedFolder', vm_file, basename, local_dirpath])
 
@@ -432,7 +432,7 @@ def share_permissions(local_dirpath, permission):
     if not os.path.isdir(local_dirpath):
         print_error('Argument for <local_dirpath> must be a directory.')
 
-    basename = ''.join([directory for directory in local_dirpath.split('/') if len(directory) is not 0][-1:])
+    basename = ''.join([directory for directory in local_dirpath.split('/') if len(directory) != 0][-1:])
     print(run_command([vmrun, 'setSharedFolderState', vm_file, basename, local_dirpath, permission]))
 
 
@@ -605,7 +605,7 @@ if __name__ == '__main__':
         if vm_alias not in vms_cfg:
             print_error('VM alias "' + vm_alias + '" not found in vms_cfg.')
 
-        if len(vms_cfg[vm_alias]['host']) is 0 or len(vms_cfg[vm_alias]['ssh_user']) is 0:
+        if len(vms_cfg[vm_alias]['host']) == 0 or len(vms_cfg[vm_alias]['ssh_user']) == 0:
             print_error('VM alias IP or SSH user for "' + vm_alias + '" not found in vms_cfg.')
 
         else:
