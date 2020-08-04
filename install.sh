@@ -21,9 +21,9 @@ case `uname` in
         profile='' ;;
 esac
 
-echo >> ~/$profile
-echo '### vmrun' >> ~/$profile
-echo "alias vmrun='$py $vmrun'" >> ~/$profile
+echo 'Remember to set an alias as:'
+echo '### vmrun'
+echo "alias vmrun='$py $vmrun'"
 
 # config
 cp config_sample.json ~/.vmrun_config.json
